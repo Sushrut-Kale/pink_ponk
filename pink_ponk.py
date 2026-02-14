@@ -1,10 +1,16 @@
 from manim import *
+from manim.utils.color.X11 import BLUE2, ORANGE3, PURPLE2
 import numpy as np
 import random
+
 class Pong(Scene):
     def construct(self):
-        rect1 = Rectangle(height=2, width=0.2, color=BLUE).move_to(LEFT * 7)
-        rect2 = Rectangle(height=2, width=0.2, color=BLUE).move_to(RIGHT * 7)
+        rect1 = Rectangle(height=2, width=0.2, color=PURPLE2).move_to(LEFT * 7)
+        rect2 = Rectangle(height=2, width=0.2, color=PURPLE2).move_to(RIGHT * 7)
+        rect1.set_fill(BLUE2, opacity=1)
+        rect2.set_fill(BLUE2, opacity=1)
+        rect1.blink_time = 0
+        rect2.blink_time = 0
         self.add(rect1, rect2)
         t = 0
         def leftupdate(mob, dt):
@@ -15,15 +21,25 @@ class Pong(Scene):
             mob.set_y(np.sin(t * 2 + PI) * 2.2)
         rect1.add_updater(leftupdate)
         rect2.add_updater(rightupdate)
+        def blink_updater(mob, dt):
+            if mob.blink_time > 0:
+                mob.blink_time -= dt
+                mob.set_fill(ORANGE3, opacity=1)
+            else:
+                mob.set_fill(BLUE, opacity=1)
+        rect1.add_updater(blink_updater)
+        rect2.add_updater(blink_updater)
         ball = Circle(radius=0.5, color=WHITE).move_to(ORIGIN)
         ball.set_fill(GREEN_B, opacity=0.5)
         self.add(ball)
         velocity = np.array([3,2,0])
         reset_cooldown = 0
+        colors = [RED, GREEN, BLUE, YELLOW, ORANGE, PURPLE, PINK]
         def reset_ball():
             self.add_sound("game_end.mpeg")
             nonlocal velocity, reset_cooldown
             ball.move_to(ORIGIN)
+            ball.set_fill(random.choice(colors), opacity=0.7)
             angle = random.uniform(-PI/3, PI/3)
             direction = random.choice([-1, 1])
             speed = 3.7
@@ -32,7 +48,7 @@ class Pong(Scene):
                 np.sin(angle) * speed,
                 0
             ])
-            reset_cooldown = 0.1
+            reset_cooldown = 0.2
         def ballupdate(mob, dt):
             nonlocal velocity, reset_cooldown
             if reset_cooldown > 0:
@@ -55,6 +71,7 @@ class Pong(Scene):
             ):
                 velocity[0] *= -1
                 self.add_sound("bounce.mpeg")
+                rect2.blink_time = 0.12
                 mob.set_x(rect2.get_left()[0] - mob.radius)
                 mob.scale(1.2)
             if (
@@ -63,6 +80,7 @@ class Pong(Scene):
             ):
                 velocity[0] *= -1
                 self.add_sound("bounce.mpeg")
+                rect1.blink_time = 0.12  
                 mob.set_x(rect1.get_right()[0] + mob.radius)
                 mob.scale(1.2)
             if mob.get_left()[0] > rect2.get_right()[0]:
