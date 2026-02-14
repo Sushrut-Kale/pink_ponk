@@ -1,14 +1,13 @@
 from manim import *
-from manim.utils.color.X11 import BLUE2, ORANGE3, PURPLE2
 import numpy as np
 import random
 
 class Pong(Scene):
     def construct(self):
-        rect1 = Rectangle(height=2, width=0.2, color=PURPLE2).move_to(LEFT * 7)
-        rect2 = Rectangle(height=2, width=0.2, color=PURPLE2).move_to(RIGHT * 7)
-        rect1.set_fill(BLUE2, opacity=1)
-        rect2.set_fill(BLUE2, opacity=1)
+        rect1 = Rectangle(height=2, width=0.2, color=PURPLE).move_to(LEFT * 7)
+        rect2 = Rectangle(height=2, width=0.2, color=PURPLE).move_to(RIGHT * 7)
+        rect1.set_fill(BLACK, opacity=1)
+        rect2.set_fill(BLACK, opacity=1)
         rect1.blink_time = 0
         rect2.blink_time = 0
         self.add(rect1, rect2)
@@ -24,9 +23,9 @@ class Pong(Scene):
         def blink_updater(mob, dt):
             if mob.blink_time > 0:
                 mob.blink_time -= dt
-                mob.set_fill(ORANGE3, opacity=1)
+                mob.set_fill(ORANGE, opacity=1)
             else:
-                mob.set_fill(BLUE, opacity=1)
+                mob.set_fill(BLACK, opacity=1)
         rect1.add_updater(blink_updater)
         rect2.add_updater(blink_updater)
         ball = Circle(radius=0.5, color=WHITE).move_to(ORIGIN)
